@@ -2,7 +2,8 @@ from django.contrib.auth import login
 from django.core.exceptions import ValidationError
 from knox.models import AuthToken
 from knox.views import LoginView as KnoxLoginView
-from rest_framework import permissions, status
+from rest_framework import permissions
+from rest_framework.authentication import BasicAuthentication
 from rest_framework.authtoken.serializers import AuthTokenSerializer
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -11,6 +12,7 @@ from users.serializers import RegisterSerializer, UserSerializer
 
 
 class LoginView(KnoxLoginView):
+    authentication_classes = [BasicAuthentication]
     permission_classes = (permissions.AllowAny,)
 
     def post(self, request, format=None):
@@ -38,5 +40,3 @@ class RegisterView(APIView):
             "user": UserSerializer(user).data,
             "token": token
         })
-        # except ValidationError as e:
-        #     return Response(data={e.code: [e.message]}, status=status.HTTP_400_BAD_REQUEST)
