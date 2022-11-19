@@ -16,7 +16,6 @@ def exception_handler(exc, context):
     """
 
     if isinstance(exc, DjangoValidationError):
-        code = getattr(exc, 'code', None) or 'invalid'
         exc = DRFValidationError(detail=get_error_detail(exc))
 
     return drf_exception_handler(exc, context)
