@@ -50,4 +50,5 @@ class UserView(ModelViewSet):
 
     @action(detail=False)
     def me(self, request):
-        return Response(data='test')
+        serializer = self.serializer_class(request.user)
+        return Response(serializer.data)
