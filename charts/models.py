@@ -48,5 +48,5 @@ class Chart(models.Model):
     def get_data_file_in_dict(self):
         if self.data_file:
             df = pd.read_excel(self.data_file)
-            return df.to_dict(orient='records')
-        return []
+            return df.to_dict(orient='split')
+        return {}
