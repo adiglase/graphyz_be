@@ -1,7 +1,13 @@
 from django.core.validators import FileExtensionValidator
 from django.db import models
+import pandas as pd
 
 from users.models import User
+
+
+class ChartManager(models.Manager):
+    def get_data_file_json(self):
+        return self.title
 
 
 CHART_TYPES = {
@@ -31,7 +37,16 @@ class Chart(models.Model):
     created_on = models.DateTimeField(auto_now_add=True)
     updated_on = models.DateTimeField(auto_now=True)
     title = models.CharField(max_length=255, default='Untitled')
-    data_file = models.FileField("Data", upload_to='data/', validators=[FileExtensionValidator(['xlsx'])])
+    data_file = models.FileField("Data", upload_to='data/', blank=True, null=True,
+                                 validators=[FileExtensionValidator(['xlsx'])])
     chart_type = models.CharField(choices=CHART_TYPE_CHOICES, max_length=5)
-    label = models.CharField(max_length=10)
-    value = models.CharField(max_length=10)
+    label = models.CharField(max_length=10, blank=True)
+    value = models.CharField(max_length=10, blank=True)
+
+    objects = ChartManager()
+
+    def get_data_file_in_dict(self):
+        if self.data_file:
+            df = pd.read_excel(self.data_file)
+            return df.to_dict(orient='records')
+        return []
