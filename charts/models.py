@@ -3,6 +3,7 @@ from django.core.validators import FileExtensionValidator
 from django.db import models
 import pandas as pd
 
+from charts.utils import ChartVisualization
 from users.models import User
 
 
@@ -41,8 +42,8 @@ class Chart(models.Model):
     data_file = models.FileField("Data", upload_to='data/', blank=True, null=True,
                                  validators=[FileExtensionValidator(['xlsx'])])
     chart_type = models.CharField(choices=CHART_TYPE_CHOICES, max_length=5)
-    label = models.CharField(max_length=10, blank=True)
-    value = models.CharField(max_length=10, blank=True)
+    label = models.CharField(max_length=255, blank=True)
+    value = models.CharField(max_length=255, blank=True)
 
     objects = ChartManager()
 
@@ -65,3 +66,12 @@ class Chart(models.Model):
             df = pd.read_excel(self.data_file)
             return df.to_dict(orient='split')
         return {}
+
+    def get_column_configuration_options(self):
+        column_options = []
+
+        if self.data_file:
+            df = pd.read_excel(self.data_file)
+            column_options = df.columns.values.tolist()
+
+        return column_options
