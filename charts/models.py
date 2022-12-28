@@ -1,3 +1,4 @@
+from django.core.exceptions import ObjectDoesNotExist
 from django.core.validators import FileExtensionValidator
 from django.db import models
 import pandas as pd
@@ -44,6 +45,20 @@ class Chart(models.Model):
     value = models.CharField(max_length=10, blank=True)
 
     objects = ChartManager()
+
+    def save(self, *args, **kwargs):
+        if self.id:
+            try:
+                previous_val = Chart.objects.get(pk=self.id)
+
+                if previous_val.data_file != self.data_file:
+                    # if data file has changed, we should reset the value of 'label' and 'value'
+                    self.label = ""
+                    self.value = ""
+            except ObjectDoesNotExist:
+                pass
+
+        super(Chart, self).save(*args, **kwargs)
 
     def get_data_file_in_dict(self):
         if self.data_file:

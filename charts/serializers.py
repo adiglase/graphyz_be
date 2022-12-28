@@ -26,10 +26,10 @@ class RetrieveChartSerializer(serializers.ModelSerializer):
 
 
 class UpdateChartSerializer(serializers.ModelSerializer):
-    title = serializers.CharField()
+    title = serializers.CharField(required=False)
     data_file = serializers.FileField(allow_null=True, allow_empty_file=True, required=False)
-    label = serializers.CharField(allow_blank=True, allow_null=True)
-    value = serializers.CharField(allow_blank=True, allow_null=True)
+    label = serializers.CharField(allow_blank=True, allow_null=True, required=False)
+    value = serializers.CharField(allow_blank=True, allow_null=True, required=False)
 
     class Meta:
         model = Chart
