@@ -13,9 +13,10 @@ class ChartVisualization:
         df = pd.read_excel(self.data_file)
 
         if self.chart_type == 'BC':
-            fig = px.bar(df, x=self.label, y=self.value, color=self.label)
+            fig = px.histogram(df, x=self.label, y=self.value)
         elif self.chart_type == 'LC':
             fig = px.line(df, x=self.label, y=self.value)
+        elif self.chart_type == 'PC':
+            fig = px.pie(df, names=self.label, values=self.value)
 
-        # return fig.to_html(include_plotlyjs='require', full_html=False)
         return fig.to_json(pretty=True)
