@@ -1,3 +1,5 @@
+import json
+
 from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.parsers import FormParser, MultiPartParser
@@ -39,3 +41,8 @@ class ChartViewSet(viewsets.ModelViewSet):
     def get_data_file_in_dict(self, request, pk=None):
         chart = self.get_object()
         return Response(data=chart.get_data_file_in_dict())
+
+    @action(detail=True, methods=['get'])
+    def get_chart_visualization(self, request, pk=None):
+        chart = self.get_object()
+        return Response(data=json.loads(chart.get_chart_visualization()))

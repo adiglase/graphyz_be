@@ -75,3 +75,11 @@ class Chart(models.Model):
             column_options = df.columns.values.tolist()
 
         return column_options
+
+    def get_chart_visualization(self):
+        if self.data_file and self.label and self.value:
+            chart_visualization = ChartVisualization(chart_type=self.chart_type, label=self.label, value=self.value,
+                                                     data_file=self.data_file)
+            return chart_visualization.get_chart_visualization()
+        return None
+

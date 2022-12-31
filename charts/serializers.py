@@ -1,3 +1,5 @@
+import json
+
 from rest_framework import serializers
 
 from charts.models import Chart
@@ -21,13 +23,18 @@ class CreateChartSerializer(serializers.ModelSerializer):
 
 class RetrieveChartSerializer(serializers.ModelSerializer):
     column_configuration_options = serializers.SerializerMethodField()
+    chart_visualization = serializers.SerializerMethodField()
 
     def get_column_configuration_options(self, obj):
         return obj.get_column_configuration_options()
 
+    def get_chart_visualization(self, obj):
+        chart_visualization = obj.get_chart_visualization()
+        return json.loads(chart_visualization) if chart_visualization else None
+
     class Meta:
         model = Chart
-        fields = ['title', 'chart_type', 'label', 'value', 'column_configuration_options']
+        fields = ['title', 'chart_type', 'label', 'value', 'column_configuration_options', 'chart_visualization']
 
 
 class UpdateChartSerializer(serializers.ModelSerializer):
@@ -36,10 +43,17 @@ class UpdateChartSerializer(serializers.ModelSerializer):
     label = serializers.CharField(allow_blank=True, allow_null=True, required=False)
     value = serializers.CharField(allow_blank=True, allow_null=True, required=False)
     column_configuration_options = serializers.SerializerMethodField()
+    chart_visualization = serializers.SerializerMethodField()
+
 
     def get_column_configuration_options(self, obj):
+        print(obj.get_column_configuration_options())
         return obj.get_column_configuration_options()
+
+    def get_chart_visualization(self, obj):
+        chart_visualization = obj.get_chart_visualization()
+        return json.loads(chart_visualization) if chart_visualization else None
 
     class Meta:
         model = Chart
-        fields = ['title', 'data_file', 'label', 'value', 'column_configuration_options']
+        fields = ['title', 'data_file', 'label', 'value', 'column_configuration_options', 'chart_visualization']

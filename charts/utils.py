@@ -17,11 +17,5 @@ class ChartVisualization:
         elif self.chart_type == 'LC':
             fig = px.line(df, x=self.label, y=self.value)
 
-        return fig.to_html(include_plotlyjs='cdn', full_html=False)
-
-    def get_chart(self):
-        if self.data_file and self.label and self.label:
-            chart_visualization = ChartVisualization(chart_type=self.chart_type, label=self.label, value=self.value,
-                                                     data_file=self.data_file)
-            return chart_visualization.get_chart_visualization()
-        return None
+        # return fig.to_html(include_plotlyjs='require', full_html=False)
+        return fig.to_json(pretty=True)
