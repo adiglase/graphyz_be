@@ -2,7 +2,7 @@ import json
 
 from rest_framework import serializers
 
-from charts.models import Chart
+from charts.models import Chart, CHART_TYPES
 
 
 class ChartTypeSerializer(serializers.Serializer):
@@ -13,6 +13,22 @@ class ChartTypeSerializer(serializers.Serializer):
     def get_icon(self, obj):
         request = self.context.get('request')
         return request.build_absolute_uri('/') + obj['icon']
+
+
+class UserChartListSerializer(serializers.Serializer):
+    id = serializers.CharField()
+    title = serializers.CharField()
+    icon = serializers.SerializerMethodField()
+    chart_type = serializers.CharField()
+
+    def get_icon(self, obj):
+        chart_icon_url = CHART_TYPES[obj.chart_type]['icon']
+        request = self.context.get('request')
+        return request.build_absolute_uri('/') + chart_icon_url
+
+    class Meta:
+        model = Chart
+        fields = ['id', 'title', 'icon', 'chart_type']
 
 
 class CreateChartSerializer(serializers.ModelSerializer):

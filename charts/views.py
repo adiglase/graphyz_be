@@ -9,7 +9,7 @@ from rest_framework.views import APIView
 
 from charts.models import CHART_TYPES, Chart
 from charts.serializers import ChartTypeSerializer, RetrieveChartSerializer, CreateChartSerializer, \
-    UpdateChartSerializer
+    UpdateChartSerializer, UserChartListSerializer
 
 
 class ListChartTypes(APIView):
@@ -22,20 +22,28 @@ class ListChartTypes(APIView):
 
 
 class ChartViewSet(viewsets.ModelViewSet):
+    permission_classes = (IsAuthenticated,)
     queryset = Chart.objects.all()
 
     def get_serializer_class(self):
         if self.action == 'create':
             return CreateChartSerializer
         if self.action == 'update':
-            print('going here')
             return UpdateChartSerializer
         return RetrieveChartSerializer
+
+    def perform_create(self, serializer):
+        serializer.save(created_by=self.request.user)
 
     def update(self, request, *args, **kwargs):
         # only update that use formdata so we use different parser
         self.parser_classes = (MultiPartParser, FormParser)
         return super().update(request, *args, **kwargs)
+
+    def list(self, request, *args, **kwargs):
+        queryset = Chart.objects.filter(created_by=request.user)
+        serializer = UserChartListSerializer(queryset, many=True, context={'request': request})
+        return Response(serializer.data)
 
     @action(detail=True, methods=['get'])
     def get_data_file_in_dict(self, request, pk=None):
