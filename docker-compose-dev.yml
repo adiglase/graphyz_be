@@ -1,0 +1,66 @@
+services:
+  postgres_db:
+    container_name: postgres_db
+    image: postgres:15.0
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    env_file:
+      - ./.env
+    environment:
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    restart: always
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -d $${POSTGRES_DB} -U $${POSTGRES_USER}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    ports: 
+      - 5432:5432
+  pgadmin:
+    container_name: pgadmin
+    volumes:
+      - pgadmindata:/var/lib/pgadmin
+    image: dpage/pgadmin4
+    restart: always
+    environment:
+      PGADMIN_DEFAULT_EMAIL: root@root.com
+      PGADMIN_DEFAULT_PASSWORD: root
+      PGADMIN_LISTEN_PORT: 5050
+    ports:
+      - 5050:5050
+  backend:
+    container_name: backend
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    environment:
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    ports:
+      - 8000:8000
+    volumes:
+      - .:/backend-django
+    restart: always
+    image: backend-django
+    depends_on:
+      postgres_db:
+        condition: service_healthy
+  frontend:
+    container_name: frontend
+    build:
+      context: ../graphyz_fe
+      dockerfile: Dockerfile.dev
+    volumes:
+      - ../graphyz_fe:/frontend-vue
+    ports:
+      - 9000:9000
+    depends_on:
+      - backend
+volumes:
+  pgdata:
+  pgadmindata:
+  frontend_build:
+  backend_django:
